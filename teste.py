@@ -22,33 +22,50 @@ dados_quadro.rename(columns={'Close': 'Media_Mensal'}, inplace=True)
 dados_quadro['Media_mais_10pct'] = dados_quadro['Media_Mensal'] * 1.10
 dados_quadro['Media_menos_10pct'] = dados_quadro['Media_Mensal'] * 0.90
 
-# Inicializar listas para datas
+# Inicializar listas para guardar as datas encontradas
 datas_atingiu_mais10 = []
 datas_atingiu_menos10 = []
 
-# Iterar por cada linha de dados_quadro
-for idx, linha in dados_quadro.iterrows():
-    ano_atual = int(linha['Ano'])
-    mes_atual = int(linha['Mes'])
-
-    # Data de referência (primeiro dia do mês)
-    data_inicio = datetime(ano_atual, mes_atual, 1)
-
-    # Limites
-    limite_superior = linha['Media_mais_10pct']
-    limite_inferior = linha['Media_menos_10pct']
-
-    # Filtrar apenas dados após esse mês
+# Iterar por cada mês na tabela de médias
+for i in range(len(dados_quadro)):
+    linha = dados_quadro.iloc[i]
+    
+    ano = int(linha['Ano'])
+    mes = int(linha['Mes'])
+    media_mensal = linha['Media_Mensal']
+    limite_mais10 = linha['Media_mais_10pct']
+    limite_menos10 = linha['Media_menos_10pct']
+    
+    # Data de início para procurar (primeiro dia do mês)
+    data_inicio = datetime(ano, mes, 1)
+    
+    # Filtrar apenas os dados após esse mês
     df_futuro = dados_df[dados_df.index > data_inicio]
+    
+    # Inicializar datas como "não encontradas"
+    data_mais10 = pd.NaT
+    data_menos10 = pd.NaT
 
-    # Verificar a primeira data em que atinge os limites
-    data_mais10 = df_futuro[df_futuro['Close'] >= limite_superior].index.min()
-    data_menos10 = df_futuro[df_futuro['Close'] <= limite_inferior].index.min()
+    # Iterar linha por linha do DataFrame futuro
+    for data, row in df_futuro.iterrows():
+        preco = row['Close']
 
-    datas_atingiu_mais10.append(data_mais10 if pd.notna(data_mais10) else pd.NaT)
-    datas_atingiu_menos10.append(data_menos10 if pd.notna(data_menos10) else pd.NaT)
+        # Verificar +10%
+        if pd.isna(data_mais10) and preco >= limite_mais10:
+            data_mais10 = data
 
-# Adicionar colunas ao quadro final
+        # Verificar -10%
+        if pd.isna(data_menos10) and preco <= limite_menos10:
+            data_menos10 = data
+
+        # Se já encontrou as duas datas, pode parar o loop
+        if pd.notna(data_mais10) and pd.notna(data_menos10):
+            break
+    
+    datas_atingiu_mais10.append(data_mais10)
+    datas_atingiu_menos10.append(data_menos10)
+
+# Adicionar as datas ao DataFrame de resumo
 dados_quadro['Data_atingiu_+10%'] = datas_atingiu_mais10
 dados_quadro['Data_atingiu_-10%'] = datas_atingiu_menos10
 
