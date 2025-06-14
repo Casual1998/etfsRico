@@ -61,7 +61,7 @@ for i in range(len(dados_quadro)):
         # Se já encontrou as duas datas, pode parar o loop
         if pd.notna(data_mais10) and pd.notna(data_menos10):
             break
-    
+    1
     datas_atingiu_mais10.append(data_mais10)
     datas_atingiu_menos10.append(data_menos10)
 
