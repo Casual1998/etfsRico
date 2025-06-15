@@ -1,17 +1,16 @@
 import yfinance as yf
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from graficos import gerar_graficos_a_partir_excel
+# from graficos import gerar_graficos_a_partir_excel  # Comentado pois depende do seu módulo
 
 def processar_etf(ticker_simbolo, nome_ficheiro_excel):
     # Obter dados do ticker (ETF ou ação)
     etf = yf.Ticker(ticker_simbolo)
-    dados = etf.history(period="1500d")
+    dados = etf.history(period="500d")
 
     # Garantir que é DataFrame e normalizar o índice
     dados_df = pd.DataFrame(dados)
@@ -80,6 +79,15 @@ def processar_etf(ticker_simbolo, nome_ficheiro_excel):
     dados_quadro['Data_atingiu_-10%'] = datas_atingiu_menos10
     dados_quadro['Preco_atingiu_-10%'] = precos_atingiu_menos10
 
+    # Verificação para ver se alguma data de atingiu +10% ou -10% é igual a hoje
+    hoje = pd.to_datetime(date.today())
+
+    for i, row in dados_quadro.iterrows():
+        if pd.notna(row['Data_atingiu_+10%']) and row['Data_atingiu_+10%'].date() == hoje.date():
+            print(f"✅ {ticker_simbolo}: Preço atingiu +10% exatamente hoje ({hoje.date()})!")
+        if pd.notna(row['Data_atingiu_-10%']) and row['Data_atingiu_-10%'].date() == hoje.date():
+            print(f"⚠️ {ticker_simbolo}: Preço atingiu -10% exatamente hoje ({hoje.date()})!")
+
     # Exportar para Excel
     with pd.ExcelWriter(nome_ficheiro_excel, engine="openpyxl", mode="w") as writer:
         dados_df.to_excel(writer, sheet_name="Dados_Diarios", index=True)
@@ -87,17 +95,14 @@ def processar_etf(ticker_simbolo, nome_ficheiro_excel):
 
     print(f"✅ Ficheiro '{nome_ficheiro_excel}' exportado com sucesso!")
 
-# Exemplo: usar para NVIDIA
+# Exemplos de uso
+
 processar_etf("NVDA", "ficheiros/nvda_ultimos_2_anos.xlsx")
-
-# Exemplo: usar para S&P 500 (ETF europeu como SXR8.DE)
 processar_etf("SXR8.DE", "ficheiros/sp500_ultimos_2_anos.xlsx")
-
 processar_etf("TQQQ", "ficheiros/tqqq_ultimos_2_anos.xlsx")
 processar_etf("SOXL", "ficheiros/soxl_ultimos_2_anos.xlsx")
 
+processar_etf("LQQ.DE", "ficheiros/exxt_ultimos_2_anos.xlsx")  
 
-# Chamar a função com o caminho correto para o ficheiro
-gerar_graficos_a_partir_excel("ficheiros/nvda_ultimos_2_anos.xlsx")
-
-
+# Se quiser usar a função de gerar gráficos (descomente e ajuste o caminho):
+# gerar_graficos_a_partir_excel("ficheiros/nvda_ultimos_2_anos.xlsx")
