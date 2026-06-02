@@ -1,0 +1,31 @@
+apt install venv
+
+source venv/bin/activate
+
+
+
+
+
+ETFS = {
+
+    # Os teus originais (A funcionar 100%)
+    "SXR8.DE": "sxr8_analise.xlsx",          # S&P 500
+    "VWCE.DE": "vwce_analise.xlsx",          # Todo o Mundo   
+
+    # Alta Volatilidade / Tecnológicas (A funcionar 100%)
+    "SXRV.DE": "nasdaq100_analise.xlsx",     # NASDAQ 100
+    "QDVE.DE": "sp500_tech_analise.xlsx",    # S&P 500 Tech
+    "VVSM.DE": "semicondutores_analise.xlsx",# Semicondutores / Microchips
+
+    # --- CORRIGIDOS PARA O YAHOO FINANCE ---
+    # 1. Momentum (Substitído pelo equivalente exato da iShares, ultra estável no Yahoo)
+    "IS3R.DE": "momentum_analise.xlsx",      # iShares Edge MSCI World Momentum UCITS €
+
+    # Petróleo e Gás JUNTOS (Empresas)
+    "EXV1.DE": "energia_europa_analise.xlsx", # Gigantes Europeias (Shell, BP...)
+    "ZPDW.DE": "energia_eua_analise.xlsx",    # Gigantes Americanas (Exxon, Chevron)
+
+    # --- PETRÓLEO E GÁS (Via Amesterdão/Londres em Euros) ---
+    "CRUD.L": "petroleo_brent_analise.xlsx",  # WisdomTree Brent Crude (Cotado em EUR na bolsa de Londres)
+    "NGAS.L": "gas_natural_analise.xlsx",     # WisdomTree Natural Gas (Cotado em EUR na bolsa de Londres)
+}
